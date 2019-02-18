@@ -1,9 +1,9 @@
 export APPNAME=training
-export PUBLICIP=3.92.59.16
-clusters=3
-loadbalancer=ext-djannot
+export PUBLICIP=54.69.216.107
+clusters=25
+loadbalancer=ext-cmcinerney
 # The group ID of the AWS Security Group of the DC/OS public nodes
-group=sg-0cd4ff71f6dbc2ac0
+group=sg-0888b1a61a91e6dfc
 
 ./create-and-attach-volumes.sh
 # If clusters < 10, then use 01, 02, ...
