@@ -19,14 +19,6 @@ During the labs, replace X by the number assigned by the instructor (starting wi
 
 ## Pre requisites
 
-You need to have access to a DC/OS Enteprise Edition cluster deployed in strict mode with 1.12.1 or later.
-
-The DC/OS Kubernetes MKE package must be installed in the cluster. This package is used by DC/OS to manage multiple DC/OS clusters on the same DC/OS cluster.
-
-The DC/OS EdgeLB package must be installed in the cluster. This package is used by DC/OS to expose the Kubernetes API server, the Portworx UI and the Kubernetes apps to the outside world.
-
-Portworx must be deployed on the DC/OS cluster.
-
 Run the following command to export the environment variables needed during the labs:
 
 ```
@@ -41,6 +33,9 @@ Run the following command to setup the DC/OS CLI:
 
 ```
 dcos cluster setup https://<IP provided by the instructor>
+dcos auth login
+username: bootstrapuser
+password: deleteme
 ```
 
 Run the following command to add the DC/OS Enterprise extensions to the DC/OS CLI:
