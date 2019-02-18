@@ -33,6 +33,9 @@ Run the following command to setup the DC/OS CLI:
 
 ```
 dcos cluster setup https://<IP provided by the instructor>
+username: bootstrapuser
+password: deleteme
+
 dcos auth login
 username: bootstrapuser
 password: deleteme
