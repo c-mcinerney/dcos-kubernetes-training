@@ -23,7 +23,7 @@ Run the following command to export the environment variables needed during the 
 
 ```
 export APPNAME=training
-export PUBLICIP=<IP provided by the instructor>
+export PUBLICIP=54.69.216.107
 export CLUSTER=<the number assigned by the instructor: 00, 01, ..>
 ```
 
@@ -32,7 +32,7 @@ Log into the DC/OS Kubernetes cluster with the information provided by your inst
 Run the following command to setup the DC/OS CLI:
 
 ```
-dcos cluster setup https://<IP provided by the instructor>
+dcos cluster setup https://52.37.68.232
 username: bootstrapuser
 password: deleteme
 
