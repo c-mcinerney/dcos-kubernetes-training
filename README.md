@@ -1,5 +1,7 @@
 # Mesosphere DC/OS Kubernetes training
 
+https://docs.google.com/spreadsheets/d/1g3UG2e-1LVGmBH8LORRIvgTXUJoHMI-ZI9IIuiLgvLM/edit?usp=sharing
+
 ## Introduction
 
 During this training, you'll learn how to use the main capabilities of Kubernetes on DC/OS:
