@@ -34,13 +34,9 @@ Log into the DC/OS Kubernetes cluster with the information provided by your inst
 Run the following command to setup the DC/OS CLI:
 
 ```
-dcos cluster setup https://52.37.68.232
-username: bootstrapuser
-password: deleteme
+dcos cluster setup https://34.216.72.146 --username=bootstrapuser --password=deleteme
 
-dcos auth login
-username: bootstrapuser
-password: deleteme
+dcos auth login --username=bootstrapuser --password=deleteme
 ```
 
 Run the following command to add the DC/OS Enterprise extensions to the DC/OS CLI:
