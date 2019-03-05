@@ -36,7 +36,7 @@ set CLUSTER=<the number assigned by the instructor: 00, 01, ..>
 ```
 Log into the DC/OS Kubernetes cluster with the information provided by your instructor and download the DC/OS CLI.
 
-## Step 1: Set Up DC/OS Command Line from the web interface on your Local Machine
+Set Up DC/OS Command Line from the web interface on your Local Machine
 
 Set up the DC/OS command line by clicking on the top right and choosing "install CLI"
 
