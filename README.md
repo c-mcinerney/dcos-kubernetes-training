@@ -38,7 +38,7 @@ Log into the DC/OS Kubernetes cluster with the information provided by your inst
 
 ## Step 1: Set Up DC/OS Command Line from the web interface on your Local Machine
 
-Set up the DC/OS command line by clicking on the top left and choosing "install CLI"
+Set up the DC/OS command line by clicking on the top right and choosing "install CLI"
 
 ![CLI](https://i.imgur.com/p4kqIj6.png)
 
