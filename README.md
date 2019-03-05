@@ -11,11 +11,7 @@ During this training, you'll learn how to use the main capabilities of Kubernete
 - Upgrade a Kubernetes cluster
 - Expose a Kubernetes Application using a Service Type Load Balancer (L4)
 - Expose a Kubernetes Application using an Ingress (L7)
-- Leverage persistent storage using Portworx
-- Leverage persistent storage using CSI
-- Configure Helm
-- Deploy Istio using Helm
-- Deploy an application on Istio
+
 
 During the labs, replace X by the number assigned by the instructor (starting with 00).
 
@@ -194,20 +190,29 @@ It will allow you to create the DC/OS service account with the right permissions
 
 Deploy your Kubernetes cluster using the following command:
 
+Mac/Linux
 ```
 dcos package install kubernetes --cli --yes
 chmod +x deploy-kubernetes-cluster.sh
 ./deploy-kubernetes-cluster.sh ${CLUSTER}
 ```
-
+Windows
+```
+dcos package install kubernetes --cli --yes
+deploy-kubernetes-cluster.bat %CLUSTER%
+```
 Configure the Kubernetes CLI using the following command:
 
+Mac/Linux
 ```
 dcos kubernetes cluster kubeconfig --context-name=${APPNAME}-prod-k8s-cluster${CLUSTER} --cluster-name=${APPNAME}/prod/k8s/cluster${CLUSTER} \
     --apiserver-url https://${APPNAME}.prod.k8s.cluster${CLUSTER}.mesos.lab:443 \
     --insecure-skip-tls-verify
 ```
-
+Windows
+```
+dcos kubernetes cluster kubeconfig --context-name=%APPNAME%-prod-k8s-cluster%CLUSTER% --cluster name=%APPNAME%/prod/k8s/cluster%CLUSTER% --apiserver-url https://%APPNAME%.prod.k8s.cluster%CLUSTER%.mesos.lab:443 --insecure-skip-tls-verify
+```
 Run the following command to check that everything is working properly:
 
 ```
@@ -220,8 +225,14 @@ kube-node-1-kubelet.trainingprodk8scluster${CLUSTER}.mesos             Ready    
 
 Copy the Kubernetes config file in your current directory
 
+Mac/Linux
 ```
 cp ~/.kube/config .
+```
+
+Windows
+```
+copy %HOME%\.kube\config .
 ```
 
 Run the following command **in a different shell** to run a proxy that will allow you to access the Kubernetes Dashboard:
@@ -414,343 +425,4 @@ curl -H "Host: http-echo-${CLUSTER}-1.com" http://${PUBLICIP}:90${CLUSTER}
 curl -H "Host: http-echo-${CLUSTER}-2.com" http://${PUBLICIP}:90${CLUSTER}
 ```
 
-## 6. Leverage persistent storage using Portworx
 
-Portworx is a Software Defined Software that can use the local storage of the DC/OS nodes to provide High Available persistent storage to both Kubernetes pods and DC/OS services.
-
-To be able to use Portworx persistent storage on your Kubernetes cluster, you need to deploy it in your Kubernetes cluster using the following command:
-
-```
-kubectl apply -f "https://install.portworx.com/2.0?kbver=1.13.3&b=true&dcos=true&stork=true"
-```
-
-Create the Kubernetes StorageClass using the following command:
-
-```
-cat <<EOF | kubectl create -f -
-kind: StorageClass
-apiVersion: storage.k8s.io/v1beta1
-metadata:
-   name: portworx-sc
-provisioner: kubernetes.io/portworx-volume
-parameters:
-  repl: "2"
-EOF
-```
-
-It will create volumes on Portworx with 2 replicas.
-
-Run the following command to define this StorageClass as the default Storage Class in your Kubernetes cluster:
-
-```
-kubectl patch storageclass portworx-sc -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
-```
-
-Create the Kubernetes PersistentVolumeClaim using the following command:
-
-```
-cat <<EOF | kubectl create -f -
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: pvc001
-  annotations:
-    volume.beta.kubernetes.io/storage-class: portworx-sc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
-EOF
-```
-
-Check the status of the PersistentVolumeClaim using the following command:
-
-```
-kubectl describe pvc pvc001
-Name:          pvc001
-Namespace:     default
-StorageClass:  portworx-sc
-Status:        Bound
-Volume:        pvc-82a8c601-2183-11e9-8f3c-3efe47e3184c
-Labels:        <none>
-Annotations:   pv.kubernetes.io/bind-completed: yes
-               pv.kubernetes.io/bound-by-controller: yes
-               volume.beta.kubernetes.io/storage-class: portworx-sc
-               volume.beta.kubernetes.io/storage-provisioner: kubernetes.io/portworx-volume
-Finalizers:    [kubernetes.io/pvc-protection]
-Capacity:      1Gi
-Access Modes:  RWO
-VolumeMode:    Filesystem
-Events:
-  Type       Reason                 Age   From                         Message
-  ----       ------                 ----  ----                         -------
-  Normal     ProvisioningSucceeded  5s    persistentvolume-controller  Successfully provisioned volume pvc-82a8c601-2183-11e9-8f3c-3efe47e3184c using kubernetes.io/portworx-volume
-Mounted By:  <none>
-```
-
-Create a Kubernetes Pod that will use this PersistentVolumeClaim using the following command:
-
-```
-cat <<EOF | kubectl create -f -
-apiVersion: v1
-kind: Pod
-metadata:
-  name: pvpod
-spec:
-  containers:
-  - name: test-container
-    image: alpine:latest
-    command: [ "/bin/sh" ]
-    args: [ "-c", "while true; do sleep 60;done" ]
-    volumeMounts:
-    - name: test-volume
-      mountPath: /test-portworx-volume
-  volumes:
-  - name: test-volume
-    persistentVolumeClaim:
-      claimName: pvc001
-EOF
-```
-
-Create a file in the Volume using the following commands:
-
-```
-kubectl exec -i pvpod -- /bin/sh -c "echo test > /test-portworx-volume/test"
-```
-
-Delete the Pod using the following command:
-
-```
-kubectl delete pod pvpod
-```
-
-Create a Kubernetes Pod that will use the same PersistentVolumeClaim using the following command:
-
-```
-cat <<EOF | kubectl create -f -
-apiVersion: v1
-kind: Pod
-metadata:
-  name: pvpod
-spec:
-  containers:
-  - name: test-container
-    image: alpine:latest
-    command: [ "/bin/sh" ]
-    args: [ "-c", "while true; do sleep 60;done" ]
-    volumeMounts:
-    - name: test-volume
-      mountPath: /test-portworx-volume
-  volumes:
-  - name: test-volume
-    persistentVolumeClaim:
-      claimName: pvc001
-EOF
-```
-
-Validate that the file created in the previous Pod is still available:
-
-```
-kubectl exec -i pvpod cat /test-portworx-volume/test
-```
-
-## 7. Leverage persistent storage using CSI
-
-Unzip the archive containing the CSI driver for AWS:
-
-```
-unzip csi-driver-deployments-master.zip
-```
-
-Deploy the Kubernetes manifests in your cluster using the following command:
-
-```
-kubectl apply -f csi-driver-deployments-master/aws-ebs/kubernetes/latest/
-```
-
-Create the Kubernetes StorageClass using the following command:
-
-```
-cat <<EOF | kubectl create -f -
-kind: StorageClass
-apiVersion: storage.k8s.io/v1
-metadata:
-  name: ebs-gp2
-  annotations:
-    storageclass.kubernetes.io/is-default-class: "true"
-provisioner: ebs.csi.aws.com
-volumeBindingMode: WaitForFirstConsumer
-parameters:
-  type: gp2
-  fsType: ext4
-  encrypted: "false"
-EOF
-```
-
-This time we define the Storage Class as the default one while we create it.
-
-Create the Kubernetes PersistentVolumeClaim using the following command:
-
-```
-cat <<EOF | kubectl create -f -
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: dynamic
-spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: ebs-gp2
-  resources:
-    requests:
-      storage: 1Gi
-EOF
-```
-
-Create a Kubernetes Deployment that will use this PersistentVolumeClaim using the following command:
-
-```
-cat <<EOF | kubectl create -f -
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: ebs-dynamic-app
-  labels:
-    app: ebs-dynamic-app
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: ebs-dynamic-app
-  template:
-    metadata:
-      labels:
-        app: ebs-dynamic-app
-    spec:
-      containers:
-      - name: ebs-dynamic-app
-        image: centos:7
-        command: ["/bin/sh"]
-        args: ["-c", "while true; do echo $(date -u) >> /data/out.txt; sleep 5; done"]
-        volumeMounts:
-        - name: persistent-storage
-          mountPath: /data
-      volumes:
-      - name: persistent-storage
-        persistentVolumeClaim:
-          claimName: dynamic
-EOF
-```
-
-Check the content of the file /data/out.txt and note the first timestamp:
-
-```
-pod=$(kubectl get pods | grep ebs-dynamic-app | awk '{ print $1 }')
-kubectl exec -i $pod cat /data/out.txt
-```
-
-Delete the Pod using the following command:
-
-```
-kubectl delete pod $pod
-```
-
-The Deployment will recreate the pod automatically.
-
-Check the content of the file /data/out.txt and verify that the first timestamp is the same as the one noted previously:
-
-```
-pod=$(kubectl get pods | grep ebs-dynamic-app | awk '{ print $1 }')
-kubectl exec -i $pod cat /data/out.txt
-```
-
-## 8. Configure Helm
-
-Helm is a package manager for Kubernetes. Helm Charts helps you define, install, and upgrade even the most complex Kubernetes application.
-
-Intall Helm on your laptop using the instructions available at the URL below:
-
-[https://docs.helm.sh/using_helm/#installing-helm](https://docs.helm.sh/using_helm/#installing-helm)
-
-Tiller is the in-cluster component of Helm. It interacts directly with the Kubernetes API server to install, upgrade, query, and remove Kubernetes resources. It also stores the objects that represent releases.
-
-Run the following command to create a Kubernetes ServiceAccount for the Helm Tiller:
-
-```
-cat <<EOF | kubectl create -f -
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: tiller
-  namespace: kube-system
----
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRoleBinding
-metadata:
-  name: tiller
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: cluster-admin
-subjects:
-- kind: ServiceAccount
-  name: tiller
-  namespace: kube-system
-EOF
-```
-
-Run the following command to install Tiller into your Kubernetes cluster:
-
-```
-helm init --service-account tiller
-```
-
-## 9. Deploy Istio using Helm
-
-Cloud platforms provide a wealth of benefits for the organizations that use them. There’s no denying, however, that adopting the cloud can put strains on DevOps teams. Developers must use microservices to architect for portability, meanwhile operators are managing extremely large hybrid and multi-cloud deployments. Istio lets you connect, secure, control, and observe services.
-
-At a high level, Istio helps reduce the complexity of these deployments, and eases the strain on your development teams. It is a completely open source service mesh that layers transparently onto existing distributed applications. It is also a platform, including APIs that let it integrate into any logging platform, or telemetry or policy system. Istio’s diverse feature set lets you successfully, and efficiently, run a distributed microservice architecture, and provides a uniform way to secure, connect, and monitor microservices.
-
-Download the latest release of Istio usign the followig command:
-
-```
-curl -L https://git.io/getLatestIstio | sh -
-```
-
-You can also download the releases for other Operating Systems using the URL below:
-
-[https://github.com/istio/istio/releases](https://github.com/istio/istio/releases)
-
-Run the following commands to go to the Istio directory and to install Istio using Helm:
-
-```
-cd istio-1.0.5
-export PATH=$PWD/bin:$PATH
-helm install install/kubernetes/helm/istio --name istio --namespace istio-system \
-  --set gateways.istio-ingressgateway.serviceAnnotations."kubernetes\.dcos\.io/edgelb-pool-name"=dklb \
-  --set gateways.istio-ingressgateway.serviceAnnotations."kubernetes\.dcos\.io/edgelb-pool-size"=\"2\" \
-  --set gateways.istio-ingressgateway.ports[0].port=100${CLUSTER} \
-  --set gateways.istio-ingressgateway.ports[0].targetPort=80 \
-  --set gateways.istio-ingressgateway.ports[0].name=http2 \
-  --set gateways.istio-ingressgateway.ports[0].nodePort=30000
-```
-
-## 10. Deploy an application on Istio
-
-This example deploys a sample application composed of four separate microservices used to demonstrate various Istio features. The application displays information about a book, similar to a single catalog entry of an online book store. Displayed on the page is a description of the book, book details (ISBN, number of pages, and so on), and a few book reviews.
-
-Run the following commands to deploy the bookinfo application:
-
-```
-kubectl apply -f <(istioctl kube-inject -f samples/bookinfo/platform/kube/bookinfo.yaml)
-kubectl apply -f samples/bookinfo/networking/bookinfo-gateway.yaml
-```
-
-Go to the following URL to access the application:
-[http://${PUBLICIP}:100${CLUSTER}/productpage](http://${PUBLICIP}:100${CLUSTER}/productpage)
-
-You can then follow the other steps described in the Istio documentation to understand the different Istio features:
-
-[https://istio.io/docs/examples/bookinfo/](https://istio.io/docs/examples/bookinfo/)
