@@ -21,13 +21,13 @@ Run the following command to export the environment variables needed during the 
 MAC/LINUX
 ```
 export APPNAME=training
-export PUBLICIP=52.34.52.239
+export PUBLICIP=54.200.33.115
 export CLUSTER=<the number assigned by the instructor: 00, 01, ..>
 ```
 Windows
 ```
 set APPNAME=training
-set PUBLICIP=52.34.52.239
+set PUBLICIP=54.200.33.115
 set CLUSTER=<the number assigned by the instructor: 00, 01, ..>
 ```
 Log into the DC/OS Kubernetes cluster with the information provided by your instructor and download the DC/OS CLI.
