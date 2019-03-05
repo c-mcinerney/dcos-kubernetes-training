@@ -122,7 +122,7 @@ It will allow you to create the DC/OS service account with the right permissions
 Deploy your Kubernetes cluster using the following command:
 
 ```
-dcos package install kubernetes --cli
+dcos package install kubernetes --cli --yes
 chmod +x deploy-kubernetes-cluster.sh
 ./deploy-kubernetes-cluster.sh ${CLUSTER}
 ```
