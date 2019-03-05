@@ -193,21 +193,28 @@ dcos kubernetes cluster create --yes --options=options-kubernetes-cluster${1}.js
 It will allow you to create the DC/OS service account with the right permissions and to deploy a Kubernetes cluster with the version 1.12.5.
 
 Deploy your Kubernetes cluster using the following command:
-
+Mac/Linux
 ```
 dcos package install kubernetes --cli --yes
 chmod +x deploy-kubernetes-cluster.sh
 ./deploy-kubernetes-cluster.sh ${CLUSTER}
 ```
-
+Windows
+```
+dcos package install kubernetes --cli --yes
+deploy-kubernetes-cluster.bat %CLUSTER%
+```
 Configure the Kubernetes CLI using the following command:
-
+Mac/Linux
 ```
 dcos kubernetes cluster kubeconfig --context-name=${APPNAME}-prod-k8s-cluster${CLUSTER} --cluster-name=${APPNAME}/prod/k8s/cluster${CLUSTER} \
     --apiserver-url https://${APPNAME}.prod.k8s.cluster${CLUSTER}.mesos.lab:443 \
     --insecure-skip-tls-verify
 ```
-
+Windows
+```
+dcos kubernetes cluster kubeconfig --context-name=%APPNAME%-prod-k8s-cluster%CLUSTER% --cluster name=%APPNAME%/prod/k8s/cluster%CLUSTER% --apiserver-url https://%APPNAME%.prod.k8s.cluster%CLUSTER%.mesos.lab:443 --insecure-skip-tls-verify
+```
 Run the following command to check that everything is working properly:
 
 ```
