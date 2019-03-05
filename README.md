@@ -206,7 +206,7 @@ Configure the Kubernetes CLI using the following command:
 Mac/Linux
 ```
 dcos kubernetes cluster kubeconfig --context-name=${APPNAME}-prod-k8s-cluster${CLUSTER} --cluster-name=${APPNAME}/prod/k8s/cluster${CLUSTER} \
-    --apiserver-url https://${APPNAME}.prod.k8s.cluster${CLUSTER}.mesos.lab:443 \
+    --apiserver-url https://${APPNAME}.prod.k8s.cluster${CLUSTER}.mesos.lab:8443 \
     --insecure-skip-tls-verify
 ```
 Windows
