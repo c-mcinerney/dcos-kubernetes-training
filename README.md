@@ -21,20 +21,22 @@ Run the following command to export the environment variables needed during the 
 MAC/LINUX
 ```
 export APPNAME=training
-export PUBLICIP=54.200.33.115
+export PUBLICIP=52.39.200.235
 export CLUSTER=<the number assigned by the instructor: 00, 01, ..>
 ```
 Windows
 ```
 set APPNAME=training
-set PUBLICIP=54.200.33.115
+set PUBLICIP=52.39.200.235
 set CLUSTER=<the number assigned by the instructor: 00, 01, ..>
 ```
 Log into the DC/OS Kubernetes cluster with the information provided by your instructor and download the DC/OS CLI.
 
 Set Up DC/OS Command Line from the web interface of the classroom cluster
 
-https://34.217.146.46
+https://mcinerneyui-1752945458.us-west-2.elb.amazonaws.com/
+
+http://mcinerneyui-1752945458.us-west-2.elb.amazonaws.com/
 
 Set up the DC/OS command line by clicking on the top right and choosing "install CLI"
 
