@@ -105,7 +105,7 @@ The output should be a list of nodes in the cluster:
 Run the following command to setup the DC/OS CLI:
 
 ```
-dcos cluster setup https://34.217.146.46 --username=bootstrapuser --password=deleteme
+dcos cluster setup https://mcinerneyui-1752945458.us-west-2.elb.amazonaws.com --username=bootstrapuser --password=deleteme
 
 dcos auth login --username=bootstrapuser --password=deleteme
 ```
