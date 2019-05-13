@@ -24,12 +24,7 @@ export APPNAME=training
 export PUBLICIP=52.39.200.235
 export CLUSTER=<the number assigned by the instructor: 00, 01, ..>
 ```
-Windows
-```
-set APPNAME=training
-set PUBLICIP=52.39.200.235
-set CLUSTER=<the number assigned by the instructor: 00, 01, ..>
-```
+
 Log into the DC/OS Kubernetes cluster with the information provided by your instructor and download the DC/OS CLI.
 
 Set Up DC/OS Command Line from the web interface of the classroom cluster
@@ -198,11 +193,7 @@ dcos package install kubernetes --cli --yes
 chmod +x deploy-kubernetes-cluster.sh
 ./deploy-kubernetes-cluster.sh ${CLUSTER}
 ```
-Windows
-```
-dcos package install kubernetes --cli --yes
-deploy-kubernetes-cluster.bat %CLUSTER%
-```
+
 Configure the Kubernetes CLI using the following command:
 
 Mac/Linux
@@ -211,10 +202,7 @@ dcos kubernetes cluster kubeconfig --context-name=${APPNAME}-prod-k8s-cluster${C
     --apiserver-url https://${APPNAME}.prod.k8s.cluster${CLUSTER}.mesos.lab:8443 \
     --insecure-skip-tls-verify
 ```
-Windows
-```
-dcos kubernetes cluster kubeconfig --context-name=%APPNAME%-prod-k8s-cluster%CLUSTER% --cluster name=%APPNAME%/prod/k8s/cluster%CLUSTER% --apiserver-url https://%APPNAME%.prod.k8s.cluster%CLUSTER%.mesos.lab:443 --insecure-skip-tls-verify
-```
+
 Run the following command to check that everything is working properly:
 
 ```
@@ -232,10 +220,6 @@ Mac/Linux
 cp ~/.kube/config .
 ```
 
-Windows
-```
-copy %HOME%\.kube\config .
-```
 
 Run the following command **in a different shell** to run a proxy that will allow you to access the Kubernetes Dashboard:
 
