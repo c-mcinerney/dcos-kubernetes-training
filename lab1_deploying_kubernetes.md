@@ -7,25 +7,87 @@
 ### Why is this Important?
 There are many ways to deploy a kubernetes cluster from a fully manual procedure to using a fully automated or opinionated SaaS. Cluster sizes can also widely vary from a single node deployment on your laptop, to thousands of nodes in a single logical cluster, or even across multiple clusters. Thus, picking a deployment model that suits the scale that you need as your business grows is important. 
 
-## Install the DC/OS Kubernetes CLI:
+## 1. Install the DC/OS Kubernetes CLI:
 The DC/OS Kubernetes CLI aims to help operators deploy, operate, maintain, and troubleshoot Kubernetes clusters running on DC/OS
 ```
 dcos package install kubernetes --cli --yes
 ```
 
-## Create Kubernetes cluster service account, assign permissions, and deploy a cluster
+## 2. Create Kubernetes cluster service account, assign permissions, and deploy a cluster
 First we need to create and configure permissions for our kubernetes cluster to be deployed
+
+Create a file called kubernetes-service-account.sh with the following content:
+
 ```
-./setup-kubernetes-cluster-permissions.sh
+cat <<EOF > kubernetes-service-account.sh
+path=${APPNAME}/prod/k8s/cluster${1}
+
+serviceaccount=$(echo $path | sed 's/\//-/g')
+role=$(echo $path | sed 's/\//__/g')-role
+
+dcos security org service-accounts keypair private-${serviceaccount}.pem public-${serviceaccount}.pem
+dcos security org service-accounts create -p public-${serviceaccount}.pem -d /${path} ${serviceaccount}
+dcos security secrets create-sa-secret --strict private-${serviceaccount}.pem ${serviceaccount} /${path}/private-${serviceaccount}
+
+dcos security org users grant ${serviceaccount} dcos:secrets:default:/${path}/* full
+dcos security org users grant ${serviceaccount} dcos:secrets:list:default:/${path} full
+dcos security org users grant ${serviceaccount} dcos:adminrouter:ops:ca:rw full
+dcos security org users grant ${serviceaccount} dcos:adminrouter:ops:ca:ro full
+dcos security org users grant ${serviceaccount} dcos:mesos:master:framework:role:${role} create
+dcos security org users grant ${serviceaccount} dcos:mesos:master:reservation:role:${role} create
+dcos security org users grant ${serviceaccount} dcos:mesos:master:reservation:principal:${serviceaccount} delete
+dcos security org users grant ${serviceaccount} dcos:mesos:master:volume:role:${role} create
+dcos security org users grant ${serviceaccount} dcos:mesos:master:volume:principal:${serviceaccount} delete
+dcos security org users grant ${serviceaccount} dcos:mesos:master:task:user:nobody create
+dcos security org users grant ${serviceaccount} dcos:mesos:master:task:user:root create
+dcos security org users grant ${serviceaccount} dcos:mesos:agent:task:user:root create
+dcos security org users grant ${serviceaccount} dcos:mesos:master:framework:role:slave_public/${role} create
+dcos security org users grant ${serviceaccount} dcos:mesos:master:framework:role:slave_public/${role} read
+dcos security org users grant ${serviceaccount} dcos:mesos:master:reservation:role:slave_public/${role} create
+dcos security org users grant ${serviceaccount} dcos:mesos:master:volume:role:slave_public/${role} create
+dcos security org users grant ${serviceaccount} dcos:mesos:master:framework:role:slave_public read
+dcos security org users grant ${serviceaccount} dcos:mesos:agent:framework:role:slave_public read
+EOF
+```
+```
+dcos package install kubernetes --cli --yes
+chmod +x kubernetes-service-account.sh
+./kubernetes-service-account.sh ${CLUSTER}
 ```
 
-Note: Ignore the 204/404 and `Does not exist` errors, these are normal.
 
-## Deploy Kubernetes
-First modify the options-kubernetes-cluster${CLUSTER}.json to match your student ID number
+It will allow you to create the DC/OS service account with the right permissions and to deploy a Kubernetes cluster with the version 1.12.5.
+
+
+
+## 3. Deploy Kubernetes
+Create a file called options-kubernetes-cluster${CLUSTER}.json using the following command:
+
 ```
-sed "s/TOBEREPLACED/${CLUSTER}/g" options-kubernetes-cluster.json.template > options-kubernetes-cluster${CLUSTER}.json
+cat <<EOF > options-kubernetes-cluster${CLUSTER}.json
+{
+  "service": {
+    "name": "training/prod/k8s/cluster${CLUSTER}",
+    "service_account": "training-prod-k8s-cluster${CLUSTER}",
+    "service_account_secret": "/training/prod/k8s/cluster${CLUSTER}/private-training-prod-k8s-cluster${CLUSTER}"
+  },
+  "kubernetes": {
+    "authorization_mode": "RBAC",
+    "high_availability": false,
+    "private_node_count": 2,
+    "private_reserved_resources": {
+      "kube_mem": 4096
+    }
+  }
+}
+EOF
 ```
+
+It will allow you to deploy a Kubernetes cluster with RBAC enabled, HA disabled (to limit the resource needed) and with 2 private nodes.
+
+Deploy your Kubernetes cluster using the following command:
+
+Mac/Linux
 
 To deploy your kubernetes cluster:
 ```
@@ -37,7 +99,7 @@ To see the status of your Kubernetes cluster deployment run:
 dcos kubernetes cluster debug plan status deploy --cluster-name=${APPNAME}/prod/k8s/cluster${CLUSTER}
 ```
 
-## Connect to Kubernetes cluster using kubectl
+## 4. Connect to Kubernetes cluster using kubectl
 Configure the Kubernetes CLI using the following command:
 ```
 dcos kubernetes cluster kubeconfig --context-name=${APPNAME}-prod-k8s-cluster${CLUSTER} --cluster-name=${APPNAME}/prod/k8s/cluster${CLUSTER} \
@@ -64,7 +126,7 @@ kube-node-0-kubelet.trainingprodk8scluster01.mesos             Ready    <none>  
 kube-node-1-kubelet.trainingprodk8scluster01.mesos             Ready    <none>   16m   v1.13.4
 ```
 
-## Connect to the Kubernetes dashboard
+## 5. Connect to the Kubernetes dashboard
 Run the following command **in a different shell** to run a proxy that will allow you to access the Kubernetes Dashboard:
 
 ```
