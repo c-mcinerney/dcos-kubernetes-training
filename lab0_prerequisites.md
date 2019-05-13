@@ -73,7 +73,8 @@ sudo chmod +x /usr/local/bin/dcos
 ## Set up DC/OS CLI Using HTTPS (required by Kubernetes)
 Run the following command to setup the DC/OS CLI:
 ```
-dcos cluster setup https://<IP provided by the instructor>
+dcos cluster setup https://mcinerneyui-1752945458.us-west-2.elb.amazonaws.com --username=bootstrapuser --password=deleteme
+
 ```
 
 To validate that you are authenticated to the DC/OS CLI using HTTPS: run:
