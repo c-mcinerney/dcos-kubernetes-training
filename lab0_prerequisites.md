@@ -1,7 +1,7 @@
 # Pre-requisites
 
 
-## Install kubectl on your local machine
+## 1. Install kubectl on your local machine
 Install the kubectl CLI using the instructions available at the URL below:
 
 [https://kubernetes.io/docs/tasks/tools/install-kubectl/](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
@@ -23,7 +23,7 @@ sudo apt-get install -y kubectl
 ```
 
 
-## Change Directory
+## 2. Change Directory
 To start your labs, create and change into a temporary directory
 ```
 cd ~/
@@ -31,7 +31,7 @@ mkdir student
 cd student
 ```
 
-## Clear all DC/OS Clusters, If Any, from your Local Machine
+## 3. Clear all DC/OS Clusters, If Any, from your Local Machine
 ```
 rm -rf ~/.dcos/clusters
 ```
@@ -44,15 +44,15 @@ sudo mv ~/.dcos/dcos.toml /tmp/dcos-clusters 2> /dev/null
 sudo rm -rf ~/.dcos 2> /dev/null
 ```
 
-## Move Existing Kube Config File, If Any, to an alternate file name
+## 4. Move Existing Kube Config File, If Any, to an alternate file name
 ```
 mv ~/.kube/config ~/.kube/config.ori
 ```
 
-## Access the DC/OS UI
+## 5. Access the DC/OS UI
 Log into the DC/OS Kubernetes cluster with the information provided by your instructor. You can also download the DC/OS CLI to use on your local machine by clicking the dropdown at the top-right --> Install CLI
 
-## Install the DC/OS CLI
+## 6. Install the DC/OS CLI
 
 Mac/OS:
 ```
@@ -86,14 +86,14 @@ Additionally, if the TLS certificate used by DC/OS is not trusted, you can run t
 dcos config set core.ssl_verify false
 ```
 
-## Install the DC/OS Enterprise CLI
+## 7. Install the DC/OS Enterprise CLI
 Run the following command to add the DC/OS Enterprise extensions to the DC/OS CLI:
 
 ```
 dcos package install --yes --cli dcos-enterprise-cli
 ```
 
-## Lab Variables
+## 8. Lab Variables
 Run the following command to export the environment variables needed during the labs:
 
 ```
@@ -103,7 +103,7 @@ export CLUSTER=<the number assigned by the instructor: 01, 02, ..>
 ```
 
 
-## Add DNS Hostname to your /etc/hosts or Windows Hosts file for our Labs
+## 9. Add DNS Hostname to your /etc/hosts or Windows Hosts file for our Labs
 Add the following line to your /etc/hosts (or c:\Windows\System32\Drivers\etc\hosts) file:
 ```
 echo "$PUBLICIP training.prod.k8s.cluster$CLUSTER.mesos.lab" >> /etc/hosts
@@ -111,7 +111,7 @@ echo "$PUBLICIP training.prod.k8s.cluster$CLUSTER.mesos.lab" >> /etc/hosts
 
 We will be using this hostname translation when connecting to our kubernetes clusters using kubectl
 
-## Verify Entry
+## 10. Verify Entry
 Verify that the entry in your /etc/hosts is correct
 ```
 cat /etc/hosts
