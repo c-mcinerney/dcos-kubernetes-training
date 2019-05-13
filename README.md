@@ -12,6 +12,8 @@ During this training, you'll learn how to use the main capabilities of Kubernete
 - Expose a Kubernetes Application using a Service Type Load Balancer (L4)
 - Expose a Kubernetes Application using an Ingress (L7)
 
+Lets get started https://github.com/c-mcinerney/dcos-kubernetes-training/blob/master/lab0_prerequisites.md
+
 
 During the labs, replace X by the number assigned by the instructor (starting with 00).
 
