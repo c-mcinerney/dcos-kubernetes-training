@@ -100,6 +100,7 @@ dcos package install --yes --cli dcos-enterprise-cli
 Run the following command to export the environment variables needed during the labs:
 
 ```
+sudo su
 export APPNAME=training
 export PUBLICIP=18.236.91.229
 export CLUSTER=<the number assigned by the instructor: 01, 02, ..>
