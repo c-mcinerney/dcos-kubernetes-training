@@ -1,6 +1,6 @@
 # Mesosphere DC/OS Kubernetes training
 
-https://docs.google.com/spreadsheets/d/1g3UG2e-1LVGmBH8LORRIvgTXUJoHMI-ZI9IIuiLgvLM/edit?usp=sharing
+https://docs.google.com/spreadsheets/d/1DNbpYQCXQ7sXu5hGm8qyTH4gr1bBXwwt80U2imoftok/edit?usp=sharing
 
 ## Introduction
 
