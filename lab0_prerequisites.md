@@ -52,6 +52,8 @@ mv ~/.kube/config ~/.kube/config.ori
 ## 5. Access the DC/OS UI
 Log into the DC/OS Kubernetes cluster with the information provided by your instructor. You can also download the DC/OS CLI to use on your local machine by clicking the dropdown at the top-right --> Install CLI
 
+https://k8s-training-oh-1833067553.us-west-2.elb.amazonaws.com
+
 ## 6. Install the DC/OS CLI
 
 Mac/OS:
