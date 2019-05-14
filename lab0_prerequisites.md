@@ -133,7 +133,7 @@ $ cat /etc/hosts
 127.0.0.1	localhost
 255.255.255.255	broadcasthost
 ::1             localhost
-34.221.133.99 training.prod.k8s.cluster01.mesos.lab
+18.236.91.229 training.prod.k8s.cluster01.mesos.lab
 ```
 
 ## Finished with the Lab 0 - Prerequisites
