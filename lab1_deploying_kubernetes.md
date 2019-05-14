@@ -12,8 +12,32 @@ The DC/OS Kubernetes CLI aims to help operators deploy, operate, maintain, and t
 ```
 dcos package install kubernetes --cli --yes
 ```
+## 2. Create Kubernetes JSON
+Create a file called options-kubernetes-cluster${CLUSTER}.json using the following command:
 
-## 2. Create Kubernetes cluster service account, assign permissions, and deploy a cluster
+```
+cat <<EOF > options-kubernetes-cluster${CLUSTER}.json
+{
+  "service": {
+    "name": "training/prod/k8s/cluster${CLUSTER}",
+    "service_account": "training-prod-k8s-cluster${CLUSTER}",
+    "service_account_secret": "/training/prod/k8s/cluster${CLUSTER}/private-training-prod-k8s-cluster${CLUSTER}"
+  },
+  "kubernetes": {
+    "authorization_mode": "RBAC",
+    "high_availability": false,
+    "private_node_count": 2,
+    "private_reserved_resources": {
+      "kube_mem": 4096
+    }
+  }
+}
+EOF
+```
+
+It will allow you to deploy a Kubernetes cluster with RBAC enabled, HA disabled (to limit the resource needed) and with 2 private nodes.
+
+## 3. Create Kubernetes cluster service account, assign permissions, and deploy a cluster
 First we need to create and configure permissions for our kubernetes cluster to be deployed
 
 Create a file called deploy-kubernetes-cluster.sh with the following content:
@@ -49,7 +73,7 @@ dcos security org users grant ${serviceaccount} dcos:mesos:master:volume:role:sl
 dcos security org users grant ${serviceaccount} dcos:mesos:master:framework:role:slave_public read
 dcos security org users grant ${serviceaccount} dcos:mesos:agent:framework:role:slave_public read
 
-dcos kubernetes cluster create --yes --options=options-kubernetes-cluster${1}.json --package-version=2.1.1-1.12.5
+dcos kubernetes cluster create --yes --options=options-kubernetes-cluster${1}.json --package-version=2.2.1-1.13.4
 ```
 
 It will allow you to create the DC/OS service account with the right permissions and to deploy a Kubernetes cluster with the version 1.12.5.
@@ -61,42 +85,6 @@ Mac/Linux
 dcos package install kubernetes --cli --yes
 chmod +x deploy-kubernetes-cluster.sh
 ./deploy-kubernetes-cluster.sh ${CLUSTER}
-```
-
-
-
-## 3. Deploy Kubernetes
-Create a file called options-kubernetes-cluster${CLUSTER}.json using the following command:
-
-```
-cat <<EOF > options-kubernetes-cluster${CLUSTER}.json
-{
-  "service": {
-    "name": "training/prod/k8s/cluster${CLUSTER}",
-    "service_account": "training-prod-k8s-cluster${CLUSTER}",
-    "service_account_secret": "/training/prod/k8s/cluster${CLUSTER}/private-training-prod-k8s-cluster${CLUSTER}"
-  },
-  "kubernetes": {
-    "authorization_mode": "RBAC",
-    "high_availability": false,
-    "private_node_count": 2,
-    "private_reserved_resources": {
-      "kube_mem": 4096
-    }
-  }
-}
-EOF
-```
-
-It will allow you to deploy a Kubernetes cluster with RBAC enabled, HA disabled (to limit the resource needed) and with 2 private nodes.
-
-Deploy your Kubernetes cluster using the following command:
-
-Mac/Linux
-
-To deploy your kubernetes cluster:
-```
-dcos kubernetes cluster create --yes --options=options-kubernetes-cluster${CLUSTER}.json --package-version=2.2.1-1.13.4
 ```
 
 To see the status of your Kubernetes cluster deployment run:
