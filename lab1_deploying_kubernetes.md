@@ -16,17 +16,18 @@ dcos package install kubernetes --cli --yes
 ## 2. Create Kubernetes cluster service account, assign permissions, and deploy a cluster
 First we need to create and configure permissions for our kubernetes cluster to be deployed
 
-Create a file called kubernetes-service-account.sh with the following content:
+Create a file called deploy-kubernetes-cluster.sh with the following content:
 
 ```
-cat <<EOF > kubernetes-service-account.sh
 path=${APPNAME}/prod/k8s/cluster${1}
 
 serviceaccount=$(echo $path | sed 's/\//-/g')
 role=$(echo $path | sed 's/\//__/g')-role
 
 dcos security org service-accounts keypair private-${serviceaccount}.pem public-${serviceaccount}.pem
+dcos security org service-accounts delete ${serviceaccount}
 dcos security org service-accounts create -p public-${serviceaccount}.pem -d /${path} ${serviceaccount}
+dcos security secrets delete /${path}/private-${serviceaccount}
 dcos security secrets create-sa-secret --strict private-${serviceaccount}.pem ${serviceaccount} /${path}/private-${serviceaccount}
 
 dcos security org users grant ${serviceaccount} dcos:secrets:default:/${path}/* full
@@ -47,16 +48,20 @@ dcos security org users grant ${serviceaccount} dcos:mesos:master:reservation:ro
 dcos security org users grant ${serviceaccount} dcos:mesos:master:volume:role:slave_public/${role} create
 dcos security org users grant ${serviceaccount} dcos:mesos:master:framework:role:slave_public read
 dcos security org users grant ${serviceaccount} dcos:mesos:agent:framework:role:slave_public read
-EOF
-```
-```
-dcos package install kubernetes --cli --yes
-chmod +x kubernetes-service-account.sh
-./kubernetes-service-account.sh ${CLUSTER}
-```
 
+dcos kubernetes cluster create --yes --options=options-kubernetes-cluster${1}.json --package-version=2.1.1-1.12.5
+```
 
 It will allow you to create the DC/OS service account with the right permissions and to deploy a Kubernetes cluster with the version 1.12.5.
+
+Deploy your Kubernetes cluster using the following command:
+
+Mac/Linux
+```
+dcos package install kubernetes --cli --yes
+chmod +x deploy-kubernetes-cluster.sh
+./deploy-kubernetes-cluster.sh ${CLUSTER}
+```
 
 
 
