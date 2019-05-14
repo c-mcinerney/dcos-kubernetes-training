@@ -73,7 +73,7 @@ sudo chmod +x /usr/local/bin/dcos
 ## Set up DC/OS CLI Using HTTPS (required by Kubernetes)
 Run the following command to setup the DC/OS CLI:
 ```
-dcos cluster setup https://mcinerneyui-1752945458.us-west-2.elb.amazonaws.com --username=bootstrapuser --password=deleteme
+dcos cluster setup https://k8s-training-oh-1833067553.us-west-2.elb.amazonaws.com --username=bootstrapuser --password=deleteme
 
 ```
 
@@ -99,7 +99,7 @@ Run the following command to export the environment variables needed during the 
 
 ```
 export APPNAME=training
-export PUBLICIP=<PUBLIC IP PROVIDED BY INSTRUCTOR>
+export PUBLICIP=18.236.91.229
 export CLUSTER=<the number assigned by the instructor: 01, 02, ..>
 ```
 
